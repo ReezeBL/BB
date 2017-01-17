@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SlimDX.Direct3D9;
 
 namespace BlessBuddy
 {
@@ -10,6 +6,12 @@ namespace BlessBuddy
     {
         static void Main(string[] args)
         {
+            var device = new Device(
+                new Direct3D(),
+                0,
+                DeviceType.Hardware,
+                System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle,
+                CreateFlags.HardwareVertexProcessing, new PresentParameters());
         }
     }
 }
