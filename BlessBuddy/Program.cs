@@ -1,17 +1,48 @@
-﻿using SlimDX.Direct3D9;
+﻿using System;
+using System.Linq;
+using System.Windows.Forms;
+using BlessBuddy.Core;
+using Process.NET;
+using Process.NET.Memory;
+using Process.NET.Native;
+using Process.NET.Native.Types;
+using Process.NET.Windows;
 
 namespace BlessBuddy
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            var device = new Device(
-                new Direct3D(),
-                0,
-                DeviceType.Hardware,
-                System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle,
-                CreateFlags.HardwareVertexProcessing, new PresentParameters());
+            System.Diagnostics.Process selectedProcess = null;
+
+            var processes = System.Diagnostics.Process.GetProcessesByName("notepad");
+            if (processes.Length <= 1)
+                selectedProcess = processes.FirstOrDefault();
+            else
+            {
+                for (int i = 0; i < processes.Length; i++)
+                {
+                    Console.WriteLine($"{i + 1}) {processes[i].ProcessName} - {processes[i].Id}");
+                }
+                int input;
+                if (int.TryParse(Console.ReadLine(), out input))
+                    selectedProcess = processes[input];
+                else
+                    Console.WriteLine("Incorrect input value!");
+            }
+
+            if (selectedProcess != null)
+            {
+                ZafkielEngine.AttachToProcess(selectedProcess);
+                ZafkielEngine.Run();
+            }
+            else
+            {
+                Console.WriteLine("No processes finded!");
+            }
         }
+       
     }
+
 }
