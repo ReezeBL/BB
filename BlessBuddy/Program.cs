@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 using BlessBuddy.Core;
 using Process.NET;
@@ -42,7 +43,6 @@ namespace BlessBuddy
                 Console.WriteLine("No processes finded!");
             }
         }
-       
     }
 
 }

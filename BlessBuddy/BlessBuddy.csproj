@@ -76,7 +76,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\CachedValue.cs" />
+    <Compile Include="Core\Game\GameData\PlayerClass.cs" />
     <Compile Include="Core\PerFrameCachedValue.cs" />
+    <Compile Include="Core\TestClass.cs" />
     <Compile Include="Core\ZafkielEngine.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
