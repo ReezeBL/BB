@@ -17,7 +17,7 @@ namespace BlessBuddy
         {
             System.Diagnostics.Process selectedProcess = null;
 
-            var processes = System.Diagnostics.Process.GetProcessesByName("notepad");
+            var processes = System.Diagnostics.Process.GetProcessesByName("Bless");
             if (processes.Length <= 1)
                 selectedProcess = processes.FirstOrDefault();
             else
