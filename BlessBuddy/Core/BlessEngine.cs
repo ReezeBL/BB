@@ -63,7 +63,13 @@ namespace BlessBuddy.Core
                 if (objectPtr == IntPtr.Zero)
                     continue;
                 var nameOffset = Memory[objectPtr].Read<int>(0x48);
-                sb.AppendLine($"GObject[{objectPtr.ToInt64():X}]\t{NamesTable[nameOffset]}\t{i.ToString("000000")}");
+                string name;
+                if (NamesTable.TryGetValue(nameOffset, out name))
+                    sb.AppendLine($"GObject[{objectPtr.ToInt64():X}]\t{NamesTable[nameOffset]}\t{i.ToString("000000")}");
+                else
+                {
+                    Console.WriteLine($"KeyNotFound: {nameOffset}");
+                }
             }
             File.WriteAllText("ObjectsDump.txt", sb.ToString());
         }
