@@ -13,7 +13,8 @@ namespace BlessBuddy.Core
 {
     public static class BlessEngine
     {
-        public static ProcessSharp Memory { get; private set; }
+        public static ProcessSharp Process { get; private set; }
+        public static IMemory Memory { get; private set; }
         private static IProcessModule _mainModule;
         private static bool _processIsRunning;
 
@@ -26,17 +27,13 @@ namespace BlessBuddy.Core
 
         public static void AttachToProcess(System.Diagnostics.Process nativeProcess)
         {
-            Memory = new ProcessSharp(nativeProcess, MemoryType.Remote);
+            Process = new ProcessSharp(nativeProcess, MemoryType.Remote);
+            Memory = Process.Memory;
             _processIsRunning = true;
 
-            Memory.ProcessExited += delegate { _processIsRunning = false; };
+            Process.ProcessExited += delegate { _processIsRunning = false; };
 
-            _mainModule = Memory.ModuleFactory.MainModule;
-        }
-
-        public static T Read<T>(int offset)
-        {
-            return _mainModule.Read<T>(offset);
+            _mainModule = Process.ModuleFactory.MainModule;
         }
 
         public static void Run()
@@ -59,10 +56,10 @@ namespace BlessBuddy.Core
             var sb = new StringBuilder();
             for (int i = 0; i < objectsArray.ElementsCount; i++)
             {
-                var objectPtr = Memory[objectsArray.ArrayPtr].Read<IntPtr>(i * 8);
+                var objectPtr = Memory.Read<IntPtr>(objectsArray.ArrayPtr + i * 8);
                 if (objectPtr == IntPtr.Zero)
                     continue;
-                var nameOffset = Memory[objectPtr].Read<int>(0x48);
+                var nameOffset = Memory.Read<int>(objectPtr + 0x48);
                 string name;
                 if (NamesTable.TryGetValue(nameOffset, out name))
                     sb.AppendLine($"GObject[{objectPtr.ToInt64():X}]\t{NamesTable[nameOffset]}\t{i.ToString("000000")}");
@@ -81,10 +78,10 @@ namespace BlessBuddy.Core
             var sb = new StringBuilder();
             for (int i = 0; i < namesArray.ElementsCount; i++)
             {
-                var fnamePtr = Memory[namesArray.ArrayPtr].Read<IntPtr>(i * 8);
+                var fnamePtr = Memory.Read<IntPtr>(namesArray.ArrayPtr + i * 8);
                 if (fnamePtr != IntPtr.Zero)
                 {
-                    var name = Memory[fnamePtr].Read(0x14, Encoding.Default, 100);
+                    var name = Memory.Read(fnamePtr + 0x14, Encoding.Default, 100);
                     NamesTable[i] = name;
                     if(writeToFile)
                         sb.AppendLine($"Name[{i.ToString("000000")}]\t{name}");
