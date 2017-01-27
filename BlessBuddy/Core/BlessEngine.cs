@@ -11,15 +11,16 @@ using Process.NET.Modules;
 
 namespace BlessBuddy.Core
 {
-    public static class ZafkielEngine
+    public static class BlessEngine
     {
         public static ProcessSharp Memory { get; private set; }
         private static IProcessModule _mainModule;
         private static bool _processIsRunning;
 
-        private const int GNames = 0x43E19A8;
-        private const int GObjects = 0x43E19F0;
-        private static readonly Dictionary<int, string> namesTable = new Dictionary<int, string>();
+        private const int GNamesOffset = 0x43E19A8;
+        private const int GObjectsOffset = 0x43E19F0;
+
+        private static readonly Dictionary<int, string> NamesTable = new Dictionary<int, string>();
 
         public static uint FrameCount { get; private set; }
 
@@ -47,41 +48,40 @@ namespace BlessBuddy.Core
             while (_processIsRunning)
             {
                 FrameCount += 1;
-
                 Thread.Sleep(50);
             }
         }
 
         private static void DumpObjectsTable()
         {
-            var array = _mainModule.Read<UArray>(GObjects);
-            Console.WriteLine($"ObjectsTable contains {array.ElementsCount} objects");
+            var objectsArray = _mainModule.Read<UArray>(GObjectsOffset);
+            Console.WriteLine($"ObjectsTable contains {objectsArray.ElementsCount} objects");
             var sb = new StringBuilder();
-            for (int i = 0; i < array.ElementsCount; i++)
+            for (int i = 0; i < objectsArray.ElementsCount; i++)
             {
-                var adr = Memory[array.ArrayPtr].Read<IntPtr>(i * 8);
-                if (adr == IntPtr.Zero)
+                var objectPtr = Memory[objectsArray.ArrayPtr].Read<IntPtr>(i * 8);
+                if (objectPtr == IntPtr.Zero)
                     continue;
-                var nameOffset = Memory[adr].Read<int>(0x48);
-                sb.AppendLine($"GObject [{adr.ToInt64():X}]\t{namesTable[nameOffset]}\t{i.ToString("000000")}");
+                var nameOffset = Memory[objectPtr].Read<int>(0x48);
+                sb.AppendLine($"GObject[{objectPtr.ToInt64():X}]\t{NamesTable[nameOffset]}\t{i.ToString("000000")}");
             }
             File.WriteAllText("ObjectsDump.txt", sb.ToString());
         }
 
         private static void DumpNamesTable(bool writeToFile = false)
         {
-            var nameTable = _mainModule.Read<UArray>(GNames);
-            Console.WriteLine($"NameTable contains: {nameTable.ElementsCount} elements");
+            var namesArray = _mainModule.Read<UArray>(GNamesOffset);
+            Console.WriteLine($"NameTable contains: {namesArray.ElementsCount} elements");
             var sb = new StringBuilder();
-            for (int i = 0; i < nameTable.ElementsCount; i++)
+            for (int i = 0; i < namesArray.ElementsCount; i++)
             {
-                var addr = Memory[nameTable.ArrayPtr].Read<IntPtr>(i * 8);
-                if (addr != IntPtr.Zero)
+                var fnamePtr = Memory[namesArray.ArrayPtr].Read<IntPtr>(i * 8);
+                if (fnamePtr != IntPtr.Zero)
                 {
-                    var name = Memory[addr].Read(0x14, Encoding.Default, 100);
-                    namesTable[i] = name;
+                    var name = Memory[fnamePtr].Read(0x14, Encoding.Default, 100);
+                    NamesTable[i] = name;
                     if(writeToFile)
-                        sb.AppendLine($"Name [{i.ToString("000000")}] {name}");
+                        sb.AppendLine($"Name[{i.ToString("000000")}]\t{name}");
                 }
             }
             if(writeToFile)

@@ -12,7 +12,7 @@ namespace BlessBuddy.Core
 
         protected override bool UpdateRequires(bool force)
         {
-            var globalFrameCount = ZafkielEngine.FrameCount;
+            var globalFrameCount = BlessEngine.FrameCount;
             if (! (globalFrameCount != _frameCount | force))
                 return false;
             _frameCount = globalFrameCount;

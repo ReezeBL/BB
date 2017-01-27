@@ -35,8 +35,8 @@ namespace BlessBuddy
 
             if (selectedProcess != null)
             {
-                ZafkielEngine.AttachToProcess(selectedProcess);
-                ZafkielEngine.Run();
+                BlessEngine.AttachToProcess(selectedProcess);
+                BlessEngine.Run();
             }
             else
             {

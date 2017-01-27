@@ -11,11 +11,19 @@ namespace BlessBuddy.Core.Engine
         public int MaxElements;
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    public struct Vector3F
+    {
+        public float x;
+        public float y;
+        public float z;
+    }
+
     [StructLayout(LayoutKind.Explicit)]
     public struct FNameEntry
     {
         [FieldOffset(0)]
-        public byte[] buffer;
+        public byte[] buffer0;
         [FieldOffset(0x14)]
         public char name;
     }
@@ -23,7 +31,7 @@ namespace BlessBuddy.Core.Engine
     [StructLayout(LayoutKind.Explicit)]
     public struct UObject
     {
-        [FieldOffset(0)] public byte[] unknowData0;
+        [FieldOffset(0)] public byte[] buffer0;
         [FieldOffset(0x48)] public int fNameOffset;
     }
 }
