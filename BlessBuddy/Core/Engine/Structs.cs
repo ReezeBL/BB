@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace BlessBuddy.Core.Engine
@@ -19,11 +20,13 @@ namespace BlessBuddy.Core.Engine
         public float z;
     }
 
-    [StructLayout(LayoutKind.Explicit)]
-    public struct FNameEntry
+    [StructLayout(LayoutKind.Explicit, Size = 120)]
+    internal struct FNameEntry
     {
+        public static readonly Dictionary<int, string> Table = new Dictionary<int, string>();
+
         [FieldOffset(0)]
-        public byte[] buffer0;
+        public byte buffer0;
         [FieldOffset(0x14)]
         public char name;
     }
@@ -31,7 +34,9 @@ namespace BlessBuddy.Core.Engine
     [StructLayout(LayoutKind.Explicit)]
     public struct UObject
     {
-        [FieldOffset(0)] public byte[] buffer0;
+        [FieldOffset(0)] public IntPtr VTable;
         [FieldOffset(0x48)] public int fNameOffset;
+        [FieldOffset(0x50)] public IntPtr Class;
+        [FieldOffset(0x58)] public IntPtr ObjectArchetype;
     }
 }

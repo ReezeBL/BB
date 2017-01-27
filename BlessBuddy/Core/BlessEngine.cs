@@ -21,8 +21,6 @@ namespace BlessBuddy.Core
         private const int GNamesOffset = 0x43E19A8;
         private const int GObjectsOffset = 0x43E19F0;
 
-        private static readonly Dictionary<int, string> NamesTable = new Dictionary<int, string>();
-
         public static uint FrameCount { get; private set; }
 
         public static void AttachToProcess(System.Diagnostics.Process nativeProcess)
@@ -61,8 +59,8 @@ namespace BlessBuddy.Core
                     continue;
                 var nameOffset = Memory.Read<int>(objectPtr + 0x48);
                 string name;
-                if (NamesTable.TryGetValue(nameOffset, out name))
-                    sb.AppendLine($"GObject[{objectPtr.ToInt64():X}]\t{NamesTable[nameOffset]}\t{i.ToString("000000")}");
+                if (FNameEntry.Table.TryGetValue(nameOffset, out name))
+                    sb.AppendLine($"GObject[{objectPtr.ToInt64():X}]\t{FNameEntry.Table[nameOffset]}\t{i.ToString("000000")}");
                 else
                 {
                     Console.WriteLine($"KeyNotFound: {nameOffset}");
@@ -82,7 +80,7 @@ namespace BlessBuddy.Core
                 if (fnamePtr != IntPtr.Zero)
                 {
                     var name = Memory.Read(fnamePtr + 0x14, Encoding.Default, 100);
-                    NamesTable[i] = name;
+                    FNameEntry.Table[i] = name;
                     if(writeToFile)
                         sb.AppendLine($"Name[{i.ToString("000000")}]\t{name}");
                 }

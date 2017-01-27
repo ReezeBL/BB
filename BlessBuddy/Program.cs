@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using BlessBuddy.Core;
+using BlessBuddy.Core.Engine;
 using Process.NET;
 using Process.NET.Memory;
 using Process.NET.Native;
