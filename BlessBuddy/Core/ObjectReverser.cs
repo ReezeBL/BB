@@ -112,14 +112,20 @@ namespace BlessBuddy.Core
                 funcParams.Add(new UProperty(param));
                 param = param.Next;
             }
-            if(funcParams.Any())
+
+            bool hasReturn = (function.FunctionFlags & 0x400) != 0;
+            if (hasReturn && funcParams.Any())
                 sb.Append(GetPropertyType(funcParams.Last()) + " ");
-                
+            else
+                sb.Append("void ");
             sb.Append(function.FunctionName + "(");
-            for (int i = 0; i < funcParams.Count - 1; i++)
+
+            int paramsCount = hasReturn ? funcParams.Count - 1 : funcParams.Count;
+
+            for (int i = 0; i < paramsCount - 1; i++)
             {
                 sb.Append($"{GetPropertyType(funcParams[i])} {funcParams[i].Name}");
-                sb.Append(i == funcParams.Count - 2 ? "" : ", ");
+                sb.Append(i == paramsCount - 1? "" : ", ");
             }
             sb.Append(")");
             return sb.ToString();
