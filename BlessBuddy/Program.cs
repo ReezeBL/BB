@@ -1,13 +1,7 @@
 ﻿using System;
 using System.Linq;
-using System.Text;
-using System.Windows.Forms;
+using System.Threading;
 using BlessBuddy.Core;
-using Process.NET;
-using Process.NET.Memory;
-using Process.NET.Native;
-using Process.NET.Native.Types;
-using Process.NET.Windows;
 
 namespace BlessBuddy
 {
@@ -17,30 +11,41 @@ namespace BlessBuddy
         {
             System.Diagnostics.Process selectedProcess = null;
 
-            var processes = System.Diagnostics.Process.GetProcessesByName("Bless");
-            if (processes.Length <= 1)
-                selectedProcess = processes.FirstOrDefault();
-            else
+            while (true)
             {
-                for (int i = 0; i < processes.Length; i++)
-                {
-                    Console.WriteLine($"{i + 1}) {processes[i].ProcessName} - {processes[i].Id}");
-                }
-                int input;
-                if (int.TryParse(Console.ReadLine(), out input))
-                    selectedProcess = processes[input];
+                var processes = System.Diagnostics.Process.GetProcessesByName("Bless");
+                if (processes.Length <= 1)
+                    selectedProcess = processes.FirstOrDefault();
                 else
-                    Console.WriteLine("Incorrect input value!");
-            }
+                {
+                    for (int i = 0; i < processes.Length; i++)
+                    {
+                        Console.WriteLine($"{i + 1}) {processes[i].ProcessName} - {processes[i].Id}");
+                    }
+                    int input;
+                    if (int.TryParse(Console.ReadLine(), out input))
+                        selectedProcess = processes[input];
+                    else
+                        Console.WriteLine("Incorrect input value!");
+                }
 
-            if (selectedProcess != null)
-            {
-                BlessEngine.AttachToProcess(selectedProcess);
-                BlessEngine.Run();
-            }
-            else
-            {
-                Console.WriteLine("No processes finded!");
+                if (selectedProcess != null)
+                {
+                    Thread.Sleep(2000);
+                    BlessEngine.AttachToProcess(selectedProcess);
+                    Console.WriteLine("Succesfully attached!");
+                    try
+                    {
+                        BlessEngine.Run();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                    break;
+                }
+
+                Thread.Sleep(100);
             }
         }
     }

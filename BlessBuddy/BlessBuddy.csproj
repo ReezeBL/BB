@@ -76,7 +76,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\CachedValue.cs" />
+    <Compile Include="Core\Engine\Factories\Factory.cs" />
+    <Compile Include="Core\Engine\FNameEntry.cs" />
+    <Compile Include="Core\Engine\MemoryObject.cs" />
     <Compile Include="Core\Engine\Structs.cs" />
+    <Compile Include="Core\Engine\UArray.cs" />
+    <Compile Include="Core\Engine\UField.cs" />
+    <Compile Include="Core\Engine\UObject.cs" />
+    <Compile Include="Core\Engine\UProperty.cs" />
+    <Compile Include="Core\Engine\UStruct.cs" />
     <Compile Include="Core\Game\GameData\PlayerClass.cs" />
     <Compile Include="Core\PerFrameCachedValue.cs" />
     <Compile Include="Core\TestClass.cs" />

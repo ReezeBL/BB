@@ -2,11 +2,11 @@
 
 namespace BlessBuddy.Core
 {
-    public abstract class CachedValue<T>
+    public class CachedValue<T>
     {
         private readonly Func<T> _producer;
         private T _cachedValue;
-        private bool _cacheForced;
+        private bool _cacheForced = true;
 
         public EventHandler OnValueChanged;
 
@@ -24,9 +24,12 @@ namespace BlessBuddy.Core
             }
         }
 
-        protected abstract bool UpdateRequires(bool force);
+        protected virtual bool UpdateRequires(bool force)
+        {
+            return force;
+        }
 
-        protected CachedValue(Func<T> producerFunc)
+        public CachedValue(Func<T> producerFunc)
         {
             if (producerFunc == null)
                 throw new ArgumentNullException(nameof(producerFunc));
