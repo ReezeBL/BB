@@ -50,7 +50,9 @@ namespace BlessBuddy.Core
             {
                 FrameCount += 1;
                 Console.ReadLine();
-                ReverseClass(GObjects[100147].Class);
+
+                ObjectReverser.ReverseClass(GObjects[100147].Class);
+
                 //var nameId = 8885;
                 //var objs =
                 //GObjects.Where(obj => obj.IsValid && obj.Class.IsValid && obj.Class.NameId == nameId)
@@ -58,9 +60,10 @@ namespace BlessBuddy.Core
 
                 //foreach (var obj in objs)
                 //{
-                //    Console.WriteLine($"{obj.Name}\t\t\t{obj.BaseAddress.ToInt64():X}");
+                //    Console.WriteLine($"{obj.Name, -35}\t{obj.BaseAddress.ToInt64(),-8:X}");
                 //}
-                //Thread.Sleep(50);
+
+                //Thread.Sleep(1000);
             }
         }
 
@@ -68,12 +71,14 @@ namespace BlessBuddy.Core
         {
             Console.WriteLine($"ObjectsTable contains {GObjects.ElementsCount} objects");
             var sb = new StringBuilder();
-            foreach(var @object in GObjects)
+            for(int i =0;i < GObjects.ElementsCount; i++)
             {
-                if (!@object.IsValid)
+                var obj = GObjects[i];
+                if (!obj.IsValid)
                     continue;
-               sb.AppendLine($"GObject[{@object.BaseAddress.ToInt64():X}]\t{@object.Name}");
-                
+               sb.AppendLine($"GObject[{i:000000}]\t{obj.Name, -35}\t{obj.BaseAddress.ToInt64():X}");
+
+
             }
             File.WriteAllText("ObjectsDump.txt", sb.ToString());
         }
@@ -94,38 +99,6 @@ namespace BlessBuddy.Core
             }
             if(writeToFile)
                 File.WriteAllText("NamesDump.txt", sb.ToString());
-        }
-
-        private static void ReverseClass(UStruct objClass, StringBuilder sb = null)
-        {
-            if (!objClass.IsValid && sb != null)
-            {
-                File.WriteAllText("ReverseResults.txt", sb.ToString());
-                Console.WriteLine("Reversing done!");
-                return;
-            }
-            if (!objClass.IsValid)
-                return;
-
-            if(sb == null)
-                sb = new StringBuilder();
-
-            var objSuperClass = new UStruct(objClass.SuperField);
-            sb.AppendLine(objSuperClass.IsValid ? $"{objClass.Name} : {objSuperClass.Name}" : $"{objClass.Name}");
-
-            var property = objClass.Children;
-            while (property.IsValid)
-            {
-                var propertyStruct = new UProperty(property);
-
-                sb.AppendLine($"0x{propertyStruct.PropertyOffset:X}\t{propertyStruct.Class.Name}\t{propertyStruct.Name}");
-                property = property.Next;
-            }
-
-            sb.AppendLine();
-            sb.AppendLine();
-
-            ReverseClass(objSuperClass, sb);
         }
     }
 }

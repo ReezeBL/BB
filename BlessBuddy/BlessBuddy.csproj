@@ -82,6 +82,7 @@
     <Compile Include="Core\Engine\Structs.cs" />
     <Compile Include="Core\Engine\UArray.cs" />
     <Compile Include="Core\Engine\UField.cs" />
+    <Compile Include="Core\Engine\UFunction.cs" />
     <Compile Include="Core\Engine\UObject.cs" />
     <Compile Include="Core\Engine\UProperty.cs" />
     <Compile Include="Core\Engine\UStruct.cs" />
@@ -89,6 +90,7 @@
     <Compile Include="Core\PerFrameCachedValue.cs" />
     <Compile Include="Core\TestClass.cs" />
     <Compile Include="Core\BlessEngine.cs" />
+    <Compile Include="Core\ObjectReverser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

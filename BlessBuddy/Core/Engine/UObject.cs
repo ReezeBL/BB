@@ -8,6 +8,7 @@ namespace BlessBuddy.Core.Engine
     {
         private string _name;
         private int? _nameId;
+        private UObject _outer;
         private UStruct _class;
         private UObject _archetype;
 
@@ -46,6 +47,19 @@ namespace BlessBuddy.Core.Engine
                     _archetype = MemoryObjectFactory.CreateDeterminedObject<UObject>(addr);
                 }
                 return _archetype;
+            }
+        }
+
+        public UObject Outer
+        {
+            get
+            {
+                if (_outer == null)
+                {
+                    var addr = BlessEngine.Memory.Read<IntPtr>(BaseAddress + 0x40);
+                    _outer = MemoryObjectFactory.CreateDeterminedObject<UObject>(addr);
+                }
+                return _outer;
             }
         }
 

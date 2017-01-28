@@ -7,6 +7,7 @@ namespace BlessBuddy.Core.Engine
     {
         private UField _superField;
         private UField _children;
+        private int? _propertySize;
 
         public UField SuperField
         {
@@ -21,7 +22,6 @@ namespace BlessBuddy.Core.Engine
             }
         }
 
-
         public UField Children
         {
             get
@@ -32,6 +32,18 @@ namespace BlessBuddy.Core.Engine
                     _children = MemoryObjectFactory.CreateDeterminedObject<UField>(addr);
                 }
                 return _children;
+            }
+        }
+
+        public int PropertySize
+        {
+            get
+            {
+                if (_propertySize == null)
+                {
+                    _propertySize = BlessEngine.Memory.Read<int>(BaseAddress + 0x88);
+                }
+                return _propertySize.Value;
             }
         }
 
