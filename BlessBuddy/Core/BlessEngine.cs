@@ -1,9 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading;
 using BlessBuddy.Core.Engine;
 using BlessBuddy.Core.Engine.Factories;
 using Process.NET;
@@ -19,7 +16,7 @@ namespace BlessBuddy.Core
         public static IMemory Memory { get; private set; }
         private static bool _processIsRunning;
 
-        private static IntPtr BlessBase;
+        public static IntPtr BlessBase;
         private const int GNamesOffset = 0x43E19A8;
         private const int GObjectsOffset = 0x43E19F0;
 
@@ -49,8 +46,6 @@ namespace BlessBuddy.Core
             while (_processIsRunning)
             {
                 FrameCount += 1;
-                Console.ReadLine();
-
                 ObjectReverser.ReverseClass(GObjects[100147].Class);
 
                 //var nameId = 8885;
@@ -64,6 +59,7 @@ namespace BlessBuddy.Core
                 //}
 
                 //Thread.Sleep(1000);
+                break;
             }
         }
 
