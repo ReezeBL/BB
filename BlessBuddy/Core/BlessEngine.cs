@@ -1,25 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using BlessBuddy.Core.Engine;
+using BlessBuddy.Core.Engine.Factories;
 using Process.NET;
 using Process.NET.Memory;
-using Process.NET.Modules;
 
 namespace BlessBuddy.Core
 {
+    //Default__BLNpcBase
+    //Default__BLPlayer
     public static class BlessEngine
     {
         public static ProcessSharp Process { get; private set; }
         public static IMemory Memory { get; private set; }
-        private static IProcessModule _mainModule;
         private static bool _processIsRunning;
 
+        private static IntPtr BlessBase;
         private const int GNamesOffset = 0x43E19A8;
         private const int GObjectsOffset = 0x43E19F0;
+
+        public static UArray<FNameEntry>GNames;
+        public static UArray<UObject> GObjects; 
 
         public static uint FrameCount { get; private set; }
 
@@ -28,61 +33,68 @@ namespace BlessBuddy.Core
             Process = new ProcessSharp(nativeProcess, MemoryType.Remote);
             Memory = Process.Memory;
             _processIsRunning = true;
-
             Process.ProcessExited += delegate { _processIsRunning = false; };
 
-            _mainModule = Process.ModuleFactory.MainModule;
+            BlessBase = Process.ModuleFactory.MainModule.BaseAddress;
+            GNames = new UArray<FNameEntry>(BlessBase + GNamesOffset, MemoryObjectFactory.CreateDeterminedObject<FNameEntry>);
+            GObjects = new UArray<UObject>(BlessBase + GObjectsOffset, MemoryObjectFactory.CreateDeterminedObject<UObject>);
         }
 
         public static void Run()
         {
-            DumpNamesTable();
+            //DumpNamesTable();
             DumpObjectsTable();
             Console.WriteLine("Dumping finished!");
             
             while (_processIsRunning)
             {
                 FrameCount += 1;
-                Thread.Sleep(50);
+                Console.ReadLine();
+
+                ObjectReverser.ReverseClass(GObjects[100147].Class);
+
+                //var nameId = 8885;
+                //var objs =
+                //GObjects.Where(obj => obj.IsValid && obj.Class.IsValid && obj.Class.NameId == nameId)
+                //    .ToArray();
+
+                //foreach (var obj in objs)
+                //{
+                //    Console.WriteLine($"{obj.Name, -35}\t{obj.BaseAddress.ToInt64(),-8:X}");
+                //}
+
+                //Thread.Sleep(1000);
             }
         }
 
         private static void DumpObjectsTable()
         {
-            var objectsArray = _mainModule.Read<UArray>(GObjectsOffset);
-            Console.WriteLine($"ObjectsTable contains {objectsArray.ElementsCount} objects");
+            Console.WriteLine($"ObjectsTable contains {GObjects.ElementsCount} objects");
             var sb = new StringBuilder();
-            for (int i = 0; i < objectsArray.ElementsCount; i++)
+            for(int i =0;i < GObjects.ElementsCount; i++)
             {
-                var objectPtr = Memory.Read<IntPtr>(objectsArray.ArrayPtr + i * 8);
-                if (objectPtr == IntPtr.Zero)
+                var obj = GObjects[i];
+                if (!obj.IsValid)
                     continue;
-                var nameOffset = Memory.Read<int>(objectPtr + 0x48);
-                string name;
-                if (FNameEntry.Table.TryGetValue(nameOffset, out name))
-                    sb.AppendLine($"GObject[{objectPtr.ToInt64():X}]\t{FNameEntry.Table[nameOffset]}\t{i.ToString("000000")}");
-                else
-                {
-                    Console.WriteLine($"KeyNotFound: {nameOffset}");
-                }
+               sb.AppendLine($"GObject[{i:000000}]\t{obj.Name, -35}\t{obj.BaseAddress.ToInt64():X}");
+
+
             }
             File.WriteAllText("ObjectsDump.txt", sb.ToString());
         }
 
         private static void DumpNamesTable(bool writeToFile = false)
         {
-            var namesArray = _mainModule.Read<UArray>(GNamesOffset);
-            Console.WriteLine($"NameTable contains: {namesArray.ElementsCount} elements");
+            Console.WriteLine($"NameTable contains: {GNames.ElementsCount} elements");
             var sb = new StringBuilder();
-            for (int i = 0; i < namesArray.ElementsCount; i++)
+            for(int i = 0;i < GNames.ElementsCount; i++)
             {
-                var fnamePtr = Memory.Read<IntPtr>(namesArray.ArrayPtr + i * 8);
-                if (fnamePtr != IntPtr.Zero)
+                var nameEntry = GNames[i];
+                if (nameEntry.IsValid)
                 {
-                    var name = Memory.Read(fnamePtr + 0x14, Encoding.Default, 100);
-                    FNameEntry.Table[i] = name;
+                    FNameEntry.Table[nameEntry.Name] = i;
                     if(writeToFile)
-                        sb.AppendLine($"Name[{i.ToString("000000")}]\t{name}");
+                        sb.AppendLine($"Name[{i:000000}]\t{nameEntry.Name}");
                 }
             }
             if(writeToFile)
